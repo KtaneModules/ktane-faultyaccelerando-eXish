@@ -4,6 +4,7 @@ using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using KModkit;
 using UnityEngine;
 
@@ -31,12 +32,14 @@ public class AccelerandoScript : MonoBehaviour
     bool correct;
     bool inputStarted;
     bool incorrect = false;
+    bool newLetter = false;
     int timesCorrect = 0;
     int currentPair = 0;
     int lastPair = -1;
     int tries = 0;
     List<int> list = new List<int>();
     List<int> listx = new List<int>();
+    List<int> positions = new List<int>();
     readonly float[] timings = new float[] { 1.439f, 1.361f, 1.295f, 1.243f, 1.165f, 1.112f, 1.073f, 1.02f, .981f, .942f, .903f, .877f, .837f, .811f, .799f, .758f, .733f, .72f, .693f, .694f };
     readonly List<string> letters = new List<string>();
     readonly List<int> numbers = new List<int>();
@@ -59,6 +62,28 @@ public class AccelerandoScript : MonoBehaviour
 
     void Start()
     {
+        var rnd = RuleSeedable.GetRNG();
+        if (rnd.Seed == 1)
+        {
+            positions.Add(2);
+            positions.Add(5);
+            positions.Add(8);
+            positions.Add(11);
+        }
+        else
+        {
+            var x = Enumerable.Range(0, 12).ToList();
+            for (int i = 0; i < 4; i++)
+            {
+                var ix = rnd.Next(0, x.Count);
+                positions.Add(x[ix]);
+                x.RemoveAt(ix);
+            }
+            positions.Sort();
+        }
+        Debug.LogFormat(@"[Accelerando #{0}] Ruleseed: {1}", moduleId, rnd.Seed);
+        Debug.LogFormat(@"[Accelerando #{0}] Positions in distinct differences are: {1}", moduleId, positions.Select(x => x + 1).Join(", "));
+
         letters.AddRange(Enumerable.Range(65, 26).Select(c => ((char) c).ToString()));
         numbers.AddRange(Enumerable.Range(1, 20));
 
@@ -81,10 +106,10 @@ public class AccelerandoScript : MonoBehaviour
             listx = pairs.Select(c => Math.Abs((c.Letter[0] - 'A' + 1) - c.Number)).ToList();
             listx = listx.Distinct().ToList();
             listx.Sort();
-            list.Add(listx[2]);
-            list.Add(listx[5]);
-            list.Add(listx[8]);
-            list.Add(listx[11]);
+            for (int i = 0; i < 4; i++)
+            {
+                list.Add(listx[positions[i]]);
+            }
             Debug.LogFormat(@"[Accelerando #{0}] Pairs are: {1}", moduleId, string.Join(", ", pairs.Select(pair => pair.ToString()).ToArray()));
             Debug.LogFormat(@"[Accelerando #{0}] Distinct differences are: {1}", moduleId, listx.Join(", ").ToString());
             Debug.LogFormat(@"[Accelerando #{0}] Press the letters that have the following numbers: {1}", moduleId, list.Join(", ").ToString());
@@ -100,10 +125,7 @@ public class AccelerandoScript : MonoBehaviour
             if (correct)
             {
                 if (currentPair == lastPair)
-                {
                     Debug.LogFormat(@"[Accelerando #{0}] Tried to press {2}-{1} again.", moduleId, pairs[currentPair].Letter, pairs[currentPair].Number.ToString());
-                    return false;
-                }
                 else
                 {
                     lastPair = currentPair;
@@ -115,15 +137,11 @@ public class AccelerandoScript : MonoBehaviour
             {
                 incorrect = true;
                 if (currentPair == lastPair)
-                {
                     Debug.LogFormat(@"[Accelerando #{0}] Tried to press {2}-{1} again.", moduleId, pairs[currentPair].Letter, pairs[currentPair].Number.ToString());
-                    return false;
-                }
                 else
                 {
                     lastPair = currentPair;
                     Debug.LogFormat(@"[Accelerando #{0}] Incorrectly pressed {2}-{1}.", moduleId, pairs[currentPair].Letter, pairs[currentPair].Number.ToString());
-                    timesCorrect++;
                 };
             }
 
@@ -229,6 +247,7 @@ public class AccelerandoScript : MonoBehaviour
                 Debug.LogFormat(@"[Accelerando #{0}] You didn't press every required letter correctly. Strike.", moduleId);
                 GetComponent<KMBombModule>().HandleStrike();
                 inputStarted = false;
+                incorrect = false;
                 timesCorrect = 0;
                 currentPair = 0;
                 lastPair = -1;
@@ -284,6 +303,7 @@ public class AccelerandoScript : MonoBehaviour
         for (int i = 0; i < 20; i++)
         {
             currentPair = i;
+            newLetter = true;
             if (list.Contains(pairs[i].Number))
                 correct = true;
             else
@@ -293,10 +313,77 @@ public class AccelerandoScript : MonoBehaviour
             GetComponent<KMSelectable>().UpdateChildren();
             yield return new WaitForSeconds(timings[i]);
         }
+        newLetter = false;
         Char1.text = "";
         Char2.text = "";
         Char1.transform.parent.gameObject.SetActive(false);
         Char2.transform.parent.gameObject.SetActive(false);
     }
 
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} go/start [press the GO button] | !{0} WLMN [press these letters (note: This will also press the GO button)]";
+#pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        Match m;
+        if (moduleSolved)
+        {
+            yield return null;
+            yield return "sendtochaterror The module is already solved.";
+            yield break;
+        }
+        else if (active)
+        {
+            yield return null;
+            yield return "sendtochaterror The module is currently displaying its sequence.";
+            yield break;
+        }
+        else if (Regex.IsMatch(command, @"^\s*(go|start)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            Go.OnInteract();
+            yield break;
+        }
+        else if ((m = Regex.Match(command, @"^\s*[ABCDEFGHIJKLMNOPQRSTUVWXYZ]+\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
+        {
+            yield return null;
+            var letters = m.Groups[0].ToString();
+            Go.OnInteract();
+            for (int i = 0; i < letters.Length;)
+            {
+                yield return true;
+                yield return new WaitUntil(() => newLetter);
+                newLetter = false;
+                if (letters.Contains(pairs[currentPair].Letter))
+                {
+                    Char.OnInteract();
+                    i++;
+                }
+            }
+            yield break;
+        }
+        else
+        {
+            yield return "sendtochaterror Invalid Command.";
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        Debug.LogFormat(@"[Yes and No #{0}] Module was force solved by TP.", moduleId);
+        Go.OnInteract();
+        for (int i = 0; i < list.Count();)
+        {
+            yield return true;
+            yield return new WaitUntil(() => newLetter);
+            newLetter = false;
+            if (list.Contains(pairs[currentPair].Number))
+            {
+                Char.OnInteract();
+                i++;
+            }
+        }
+        yield break;
+    }
 }

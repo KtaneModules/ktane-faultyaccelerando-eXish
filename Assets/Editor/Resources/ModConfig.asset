@@ -14,8 +14,11 @@ MonoBehaviour:
   id: accelerando
   title: Accelerando
   author: Goofy
-  description: Keep track of an accelerating sequence of number-letter pairs and press
-    the correct letters.
-  version: 1
+  description: 'Keep track of an accelerating sequence of number-letter pairs and
+    press the correct letters.
+
+
+    Now with RuleSeed and TP support'
+  version: 2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 7d3a7af33e342664e82340c2607f699b, type: 3}

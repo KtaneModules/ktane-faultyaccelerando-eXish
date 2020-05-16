@@ -8,11 +8,33 @@
         <link rel="stylesheet" type="text/css" href="css/main.css">
         <link rel="stylesheet" type="text/css" href="css/font.css">
         <script src="js/ktane-utils.js"></script>
+		<script src="js/ruleseed.js"></script>
         <style>
             table {
                 margin: 1em auto;
             }
         </style>
+		<script>
+		        var rnd = RuleSeedable.GetRNG();
+        if (rnd.Seed == 1)
+        {
+            positions.Add(2);
+            positions.Add(5);
+            positions.Add(8);
+            positions.Add(11);
+        }
+        else
+        {
+            var x = Enumerable.Range(0, 12).ToList();
+            for (int i = 0; i < 4; i++)
+            {
+                var ix = rnd.Next(0, x.Count);
+                positions.Add(x[ix]);
+                x.RemoveAt(ix);
+            }
+            positions.Sort();
+        }
+		</script>
     </head>
     <body>
         <div class="section">
