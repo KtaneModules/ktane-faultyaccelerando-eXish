@@ -352,7 +352,9 @@ public class AccelerandoScript : MonoBehaviour
             for (int i = 0; i < letters.Length;)
             {
                 yield return true;
-                yield return new WaitUntil(() => newLetter);
+                yield return new WaitUntil(() => newLetter || !active);
+                if (!active)
+                    yield break;
                 newLetter = false;
                 if (letters.Contains(pairs[currentPair].Letter))
                 {
