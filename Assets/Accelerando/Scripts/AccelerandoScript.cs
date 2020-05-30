@@ -37,9 +37,9 @@ public class AccelerandoScript : MonoBehaviour
     int currentPair = 0;
     int lastPair = -1;
     int tries = 0;
-    List<int> list = new List<int>();
+    readonly List<int> list = new List<int>();
     List<int> listx = new List<int>();
-    List<int> positions = new List<int>();
+    readonly List<int> positions = new List<int>();
     readonly float[] timings = new float[] { 1.439f, 1.361f, 1.295f, 1.243f, 1.165f, 1.112f, 1.073f, 1.02f, .981f, .942f, .903f, .877f, .837f, .811f, .799f, .758f, .733f, .72f, .693f, .694f };
     readonly List<string> letters = new List<string>();
     readonly List<int> numbers = new List<int>();
@@ -64,24 +64,11 @@ public class AccelerandoScript : MonoBehaviour
     {
         var rnd = RuleSeedable.GetRNG();
         if (rnd.Seed == 1)
-        {
-            positions.Add(2);
-            positions.Add(5);
-            positions.Add(8);
-            positions.Add(11);
-        }
+            positions.AddRange(new[] { 2, 5, 8, 11 });
         else
-        {
-            var x = Enumerable.Range(0, 12).ToList();
-            for (int i = 0; i < 4; i++)
-            {
-                var ix = rnd.Next(0, x.Count);
-                positions.Add(x[ix]);
-                x.RemoveAt(ix);
-            }
-            positions.Sort();
-        }
-        Debug.LogFormat(@"[Accelerando #{0}] Ruleseed: {1}", moduleId, rnd.Seed);
+            positions.AddRange(rnd.ShuffleFisherYates(Enumerable.Range(0, 12).ToList()).Take(4).OrderBy(v => v));
+
+        Debug.LogFormat(@"[Accelerando #{0}] Using rule seed: {1}", moduleId, rnd.Seed);
         Debug.LogFormat(@"[Accelerando #{0}] Positions in distinct differences are: {1}", moduleId, positions.Select(x => x + 1).Join(", "));
 
         letters.AddRange(Enumerable.Range(65, 26).Select(c => ((char) c).ToString()));
