@@ -121,7 +121,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
             listx.Clear();
             list.Clear();
             listmod.Clear();
-            listx = pairs.Select(c => ((c.Letter[0] - 'A' + 1) + c.Number) % 26).ToList();
+            listx = pairs.Select(c => ((c.Letter[0] - 'A' + 1) + c.Number) > 26 ? ((c.Letter[0] - 'A' + 1) + c.Number) - 26 : ((c.Letter[0] - 'A' + 1) + c.Number)).ToList();
             listx = listx.Distinct().ToList();
             listx.Sort();
             listx.Reverse();
@@ -216,7 +216,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
             pairs.Add(new Pair { Letter = letters[i], Number = numbers[i] });
         }
 
-        listx = pairs.Select(c => ((c.Letter[0] - 'A' + 1) + c.Number) % 26).ToList();
+        listx = pairs.Select(c => ((c.Letter[0] - 'A' + 1) + c.Number) > 26 ? ((c.Letter[0] - 'A' + 1) + c.Number) - 26 : ((c.Letter[0] - 'A' + 1) + c.Number)).ToList();
         listx = listx.Distinct().ToList();
 
         if (listx.Count < 12)
@@ -304,7 +304,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
             pairs.Add(new Pair { Letter = "Z", Number = 10 });
             pairs.Add(new Pair { Letter = "Y", Number = 18 });
             pairs.Add(new Pair { Letter = "M", Number = 5 });
-            listx = pairs.Select(c => ((c.Letter[0] - 'A' + 1) + c.Number) % 26).ToList();
+            listx = pairs.Select(c => ((c.Letter[0] - 'A' + 1) + c.Number) > 26 ? ((c.Letter[0] - 'A' + 1) + c.Number) - 26 : ((c.Letter[0] - 'A' + 1) + c.Number)).ToList();
             listx = listx.Distinct().ToList();
         }
         if (tries < 500)
