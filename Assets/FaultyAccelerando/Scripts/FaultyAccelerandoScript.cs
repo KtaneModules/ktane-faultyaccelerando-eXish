@@ -1,11 +1,8 @@
 ﻿using System;
-using System.CodeDom;
-using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using KModkit;
 using UnityEngine;
 
 public class FaultyAccelerandoScript : MonoBehaviour
@@ -358,6 +355,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
 
     IEnumerator Sequence()
     {
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Started display mode", moduleId);
         SequenceAudio.Play();
         stopsIn.Clear();
         stopsInLengths.Clear();
@@ -365,6 +363,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
         stopsCycleLengths.Clear();
         stopsOut.Clear();
         stopsOutLengths.Clear();
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Generating lag times for before sequence...", moduleId);
         int totallags = 0;
         int temp = UnityEngine.Random.Range(3, 6);
         totallags += temp;
@@ -377,6 +376,8 @@ public class FaultyAccelerandoScript : MonoBehaviour
             stopsInLengths.Add(UnityEngine.Random.Range(0.3f, 0.7f));
         }
         stopsIn.Sort();
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Success", moduleId);
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Generating lag times for during sequence...", moduleId);
         temp = UnityEngine.Random.Range(3, 6);
         totallags += temp;
         for (int i = 0; i < temp; i++)
@@ -388,6 +389,8 @@ public class FaultyAccelerandoScript : MonoBehaviour
             stopsCycleLengths.Add(UnityEngine.Random.Range(1f, 1.6f));
         }
         stopsCycle.Sort();
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Success", moduleId);
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Generating lag times for after sequence...", moduleId);
         temp = UnityEngine.Random.Range(3, 6);
         if (evenLags)
             while ((temp + totallags) % 2 != 0) { temp = UnityEngine.Random.Range(3, 6); }
@@ -403,7 +406,10 @@ public class FaultyAccelerandoScript : MonoBehaviour
             stopsOutLengths.Add(UnityEngine.Random.Range(0.3f, 0.7f));
         }
         stopsOut.Sort();
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Success", moduleId);
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Waiting for sequence to end...", moduleId);
         yield return new WaitUntil(() => Mathf.Abs(SequenceAudio.time - 22.896f) < .1f);
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Sequence ended", moduleId);
         yield return StartCoroutine(MoveScale(false));
         if (inputStarted)
         {
@@ -425,7 +431,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
                 Generate();
             }
         }
-
+        Debug.LogFormat(@"<Faulty Accelerando #{0}> Ended display mode", moduleId);
         active = false;
         yield break;
     }
@@ -629,7 +635,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
     IEnumerator TwitchHandleForcedSolve()
     {
         Debug.LogFormat(@"[Faulty Accelerando #{0}] Module was force solved by TP.", moduleId);
-        while (active) { yield return true; yield return new WaitForSeconds(0.1f); }
+        while (active) { yield return true; }
         Go.OnInteract();
         for (int i = 0; i < list.Count();)
         {
@@ -641,7 +647,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
                 i++;
             }
         }
-        while (!moduleSolved) { yield return true; yield return new WaitForSeconds(0.1f); }
+        while (!moduleSolved) { yield return true; }
         yield break;
     }
 }
