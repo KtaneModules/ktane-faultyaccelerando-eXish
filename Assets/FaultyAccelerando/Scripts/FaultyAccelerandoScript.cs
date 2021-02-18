@@ -345,7 +345,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
     {
         for (int i = 0; i < list.Count; i++)
         {
-            if (check > list[i]-.1 && check < list[i] + .1)
+            if (check > (list[i]-.3) && check < (list[i] + .3))
             {
                 return true;
             }
@@ -363,13 +363,13 @@ public class FaultyAccelerandoScript : MonoBehaviour
         stopsOut.Clear();
         stopsOutLengths.Clear();
         int totallags = 0;
-        int temp = UnityEngine.Random.Range(3, 6);
+        int temp = UnityEngine.Random.Range(2, 4);
         totallags += temp;
         for (int i = 0; i < temp; i++)
         {
-            float rand = UnityEngine.Random.Range(0f, 3.45f);
+            float rand = UnityEngine.Random.Range(0.3f, 3.15f);
             while (inRange(stopsIn, rand))
-                rand = UnityEngine.Random.Range(0f, 3.45f);
+                rand = UnityEngine.Random.Range(0.3f, 3.15f);
             stopsIn.Add(rand);
             stopsInLengths.Add(UnityEngine.Random.Range(0.3f, 0.7f));
         }
@@ -385,17 +385,17 @@ public class FaultyAccelerandoScript : MonoBehaviour
             stopsCycleLengths.Add(UnityEngine.Random.Range(1f, 1.6f));
         }
         stopsCycle.Sort();
-        temp = UnityEngine.Random.Range(3, 6);
+        temp = UnityEngine.Random.Range(2, 4);
         if (evenLags)
-            while ((temp + totallags) % 2 != 0) { temp = UnityEngine.Random.Range(3, 6); }
+            while ((temp + totallags) % 2 != 0) { temp = UnityEngine.Random.Range(2, 4); }
         else
-            while ((temp + totallags) % 2 == 0) { temp = UnityEngine.Random.Range(3, 6); }
+            while ((temp + totallags) % 2 == 0) { temp = UnityEngine.Random.Range(2, 4); }
         totallags += temp;
         for (int i = 0; i < temp; i++)
         {
-            float rand = UnityEngine.Random.Range(0f, 2.497f);
+            float rand = UnityEngine.Random.Range(0.3f, 2.197f);
             while (inRange(stopsOut, rand))
-                rand = UnityEngine.Random.Range(0f, 2.497f);
+                rand = UnityEngine.Random.Range(0.3f, 2.197f);
             stopsOut.Add(rand);
             stopsOutLengths.Add(UnityEngine.Random.Range(0.3f, 0.7f));
         }
@@ -443,6 +443,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
         {
             yield return null;
             elapsed += Time.deltaTime;
+            float elapsed2;
             if (mode)
             {
                 if (passed != stopsIn.Count())
@@ -450,7 +451,12 @@ public class FaultyAccelerandoScript : MonoBehaviour
                     if (elapsed >= stopsIn[passed])
                     {
                         SequenceAudio.Pause();
-                        yield return new WaitForSeconds(stopsInLengths[passed]);
+                        elapsed2 = 0f;
+                        while (elapsed2 < stopsInLengths[passed])
+                        {
+                            yield return null;
+                            elapsed2 += Time.deltaTime;
+                        }
                         SequenceAudio.UnPause();
                         passed++;
                     }
@@ -469,7 +475,12 @@ public class FaultyAccelerandoScript : MonoBehaviour
                     if (elapsed >= stopsOut[passed])
                     {
                         SequenceAudio.Pause();
-                        yield return new WaitForSeconds(stopsOutLengths[passed]);
+                        elapsed2 = 0f;
+                        while (elapsed2 < stopsOutLengths[passed])
+                        {
+                            yield return null;
+                            elapsed2 += Time.deltaTime;
+                        }
                         SequenceAudio.UnPause();
                         passed++;
                     }
@@ -503,7 +514,13 @@ public class FaultyAccelerandoScript : MonoBehaviour
             Char2.text = pairs[i].Letter;
             GetComponent<KMSelectable>().UpdateChildren();
             SequenceAudio.pitch = 1f * speed;
-            yield return new WaitForSeconds(timings[i] / speed);
+            var elapsed = 0f;
+            var time = timings[i] / speed;
+            while (elapsed < time)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
             if (passed != stopsCycle.Count())
             {
                 if (stopsCycle[passed] == i)
@@ -514,7 +531,12 @@ public class FaultyAccelerandoScript : MonoBehaviour
                     Char1.text = "";
                     Char2.text = "";
                     lag = StartCoroutine(Lagger());
-                    yield return new WaitForSeconds(stopsCycleLengths[passed]);
+                    elapsed = 0f;
+                    while (elapsed < stopsCycleLengths[passed])
+                    {
+                        yield return null;
+                        elapsed += Time.deltaTime;
+                    }
                     SequenceAudio.UnPause();
                     StopCoroutine(lag);
                     Lag.text = "";
@@ -536,7 +558,12 @@ public class FaultyAccelerandoScript : MonoBehaviour
         while (speed > 1f)
         {
             speed -= .1f;
-            yield return new WaitForSeconds(.1f);
+            var elapsed = 0f;
+            while (elapsed < .1f)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
         }
     }
 
@@ -545,13 +572,33 @@ public class FaultyAccelerandoScript : MonoBehaviour
         while (true)
         {
             Lag.text = ".";
-            yield return new WaitForSeconds(0.2f);
+            var elapsed = 0f;
+            while (elapsed < .2f)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
             Lag.text = "..";
-            yield return new WaitForSeconds(0.2f);
+            elapsed = 0f;
+            while (elapsed < .2f)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
             Lag.text = "...";
-            yield return new WaitForSeconds(0.2f);
+            elapsed = 0f;
+            while (elapsed < .2f)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
             Lag.text = "";
-            yield return new WaitForSeconds(0.2f);
+            elapsed = 0f;
+            while (elapsed < .2f)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+            }
         }
     }
 
