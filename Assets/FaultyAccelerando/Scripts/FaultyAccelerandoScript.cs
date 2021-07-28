@@ -353,13 +353,31 @@ public class FaultyAccelerandoScript : MonoBehaviour
         return false;
     }
 
+    private bool canAddAnother(List<int> list)
+    {
+        bool[] status = new bool[20];
+        for (int i = 0; i < list.Count; i++)
+        {
+            status[list[0]] = true;
+            if (list[0] - 1 >= 0)
+                status[list[0] - 1] = true;
+            if (list[0] + 1 <= 18)
+                status[list[0] + 1] = true;
+            if (list[0] - 2 >= 0)
+                status[list[0] - 2] = true;
+            if (list[0] + 2 <= 18)
+                status[list[0] + 2] = true;
+        }
+        if (status.Contains(false))
+            return true;
+        return false;
+    }
+
     IEnumerator Sequence()
     {
         SequenceAudio.Play();
         stopsIn.Clear();
         stopsInLengths.Clear();
-        stopsCycle.Clear();
-        stopsCycleLengths.Clear();
         stopsOut.Clear();
         stopsOutLengths.Clear();
         int totallags = 0;
@@ -376,8 +394,16 @@ public class FaultyAccelerandoScript : MonoBehaviour
         stopsIn.Sort();
         temp = UnityEngine.Random.Range(3, 6);
         totallags += temp;
+        retry:
+        stopsCycle.Clear();
+        stopsCycleLengths.Clear();
         for (int i = 0; i < temp; i++)
         {
+            if (temp == 4)
+            {
+                if (!canAddAnother(stopsCycle))
+                    goto retry;
+            }
             int rand = UnityEngine.Random.Range(0, 19);
             while (stopsCycle.Contains(rand) || stopsCycle.Contains(rand-1) || stopsCycle.Contains(rand+1) || stopsCycle.Contains(rand-2) || stopsCycle.Contains(rand+2))
                 rand = UnityEngine.Random.Range(0, 19);

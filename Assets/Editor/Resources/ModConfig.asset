@@ -27,13 +27,13 @@ MonoBehaviour:
     PDF: https://ktane.timwi.de/PDF/Faulty%20Accelerando.pdf
 
 
-    Faulty Accelerando (faultyAccelerandoModule) v1.0.5
+    Faulty Accelerando (faultyAccelerandoModule) v1.0.6
 
     Original Module and Concept by Goofy
 
     Faulty Additions and Changes by eXish
 
     Twitch Plays and Rule Seed supported'
-  version: 1.0.5
+  version: 1.0.6
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 7d3a7af33e342664e82340c2607f699b, type: 3}
