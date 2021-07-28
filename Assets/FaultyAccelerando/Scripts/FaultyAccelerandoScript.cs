@@ -353,20 +353,20 @@ public class FaultyAccelerandoScript : MonoBehaviour
         return false;
     }
 
-    private bool canAddAnother(List<int> list)
+    private bool canAddAnother()
     {
-        bool[] status = new bool[20];
-        for (int i = 0; i < list.Count; i++)
+        bool[] status = new bool[19];
+        for (int i = 0; i < stopsCycle.Count; i++)
         {
-            status[list[0]] = true;
-            if (list[0] - 1 >= 0)
-                status[list[0] - 1] = true;
-            if (list[0] + 1 <= 18)
-                status[list[0] + 1] = true;
-            if (list[0] - 2 >= 0)
-                status[list[0] - 2] = true;
-            if (list[0] + 2 <= 18)
-                status[list[0] + 2] = true;
+            status[stopsCycle[i]] = true;
+            if (stopsCycle[i] - 1 >= 0)
+                status[stopsCycle[i] - 1] = true;
+            if (stopsCycle[i] + 1 <= 18)
+                status[stopsCycle[i] + 1] = true;
+            if (stopsCycle[i] - 2 >= 0)
+                status[stopsCycle[i] - 2] = true;
+            if (stopsCycle[i] + 2 <= 18)
+                status[stopsCycle[i] + 2] = true;
         }
         if (status.Contains(false))
             return true;
@@ -399,9 +399,9 @@ public class FaultyAccelerandoScript : MonoBehaviour
         stopsCycleLengths.Clear();
         for (int i = 0; i < temp; i++)
         {
-            if (temp == 4)
+            if (i == 4)
             {
-                if (!canAddAnother(stopsCycle))
+                if (!canAddAnother())
                     goto retry;
             }
             int rand = UnityEngine.Random.Range(0, 19);
