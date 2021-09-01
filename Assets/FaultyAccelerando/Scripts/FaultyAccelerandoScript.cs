@@ -427,7 +427,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
             stopsOutLengths.Add(UnityEngine.Random.Range(0.3f, 0.7f));
         }
         stopsOut.Sort();
-        yield return new WaitUntil(() => readyToFinish);
+        yield return new WaitUntil(() => readyToFinish && SequenceAudio.time > 22.896f);
         yield return StartCoroutine(MoveScale(false));
         if (inputStarted)
         {
