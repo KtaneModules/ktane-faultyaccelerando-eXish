@@ -32,6 +32,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
     bool inputStarted;
     bool incorrect = false;
     bool newLetter = false;
+    bool readyToFinish = false;
     int timesCorrect = 0;
     int currentPair = 0;
     int lastPair = -1;
@@ -426,7 +427,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
             stopsOutLengths.Add(UnityEngine.Random.Range(0.3f, 0.7f));
         }
         stopsOut.Sort();
-        yield return new WaitUntil(() => SequenceAudio.time > 22.896f);
+        yield return new WaitUntil(() => readyToFinish);
         yield return StartCoroutine(MoveScale(false));
         if (inputStarted)
         {
@@ -449,6 +450,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
             }
         }
 
+        readyToFinish = false;
         active = false;
         yield break;
     }
@@ -573,6 +575,7 @@ public class FaultyAccelerandoScript : MonoBehaviour
             }
         }
         newLetter = false;
+        readyToFinish = true;
         Char1.text = "";
         Char2.text = "";
         Char1.transform.parent.gameObject.SetActive(false);
